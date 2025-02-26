@@ -64,19 +64,11 @@ jobs:
 
         python -m build -s .
 
-        ARCH=$(uname -m)
-        ARTIFACT_NAME="$(ls ./dist | grep .tar.gz)"
-
-        # Modify artifact name ONLY for ARM64 (aarch64)
-        if [[ "$ARCH" == "aarch64" ]]; then
-          NEW_ARTIFACT_NAME="${ARTIFACT_NAME%.tar.gz}-arm64.tar.gz"
-          mv ./dist/$ARTIFACT_NAME ./dist/$NEW_ARTIFACT_NAME
-          ARTIFACT_NAME=$NEW_ARTIFACT_NAME
-        fi
         echo "artifact_name=$(ls ./dist)" >> "$GITHUB_OUTPUT"
 
     - name: Upload sdist artifact
       uses: actions/upload-artifact@v4
+      if: env.arch == 'x86_64'
       with:
         name: ${{ steps.build_sdist.outputs.artifact_name }}
         path: dist/${{ steps.build_sdist.outputs.artifact_name }}
